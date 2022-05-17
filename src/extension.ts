@@ -36,7 +36,6 @@ export function activate(context: vscode.ExtensionContext) {
     "extension.transpose",
     function () {
       const editor = vscode.window.activeTextEditor;
-
       if (!editor) return;
 
       const results = editor.selections.map((selection) =>
@@ -60,10 +59,17 @@ function transpose(
   document: vscode.TextDocument
 ): { edit?: (_: vscode.TextEditorEdit) => void; selection: vscode.Selection } {
   if (range.isEmpty) {
-    const expandedRange = new vscode.Range(
-      range.start.translate(0, -1),
-      range.end.translate(0, 1)
-    );
+    const cursor = range.start;
+    console.log(cursor, document.validatePosition(cursor.translate(0, 1)));
+    let expandedRange: vscode.Range;
+    if (document.validatePosition(cursor.translate(0, 1)).isEqual(cursor)) {
+      expandedRange = new vscode.Range(cursor.translate(0, -2), cursor);
+    } else {
+      expandedRange = new vscode.Range(
+        cursor.translate(0, -1),
+        cursor.translate(0, 1)
+      );
+    }
     const text = document.getText(expandedRange);
 
     return {
