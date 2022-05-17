@@ -1,10 +1,8 @@
-# Document Editing Sample
-
-This is an example that shows you how to create a command which makes changes to the document in the active editor.
+# Enhanced Transpose
 
 ## Demo
 
-![demo](demo.gif)
+<!-- ![demo](demo.gif) -->
 
 ## VS Code API
 
