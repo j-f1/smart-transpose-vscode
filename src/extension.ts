@@ -39,81 +39,104 @@ export function activate(context: vscode.ExtensionContext) {
 
       if (!editor) return;
 
-      const { document, selection } = editor;
-
-      const toTranspose = document.getText(selection);
-
-      if (!toTranspose) {
-        const range = new vscode.Range(
-          selection.start.translate(0, -1),
-          selection.end.translate(0, 1)
-        );
-        const text = document.getText(range);
-
-        editor.edit((editBuilder) => {
-          editBuilder.replace(range, text.split("").reverse().join(""));
+      const results = editor.selections.map((selection) =>
+        transpose(selection, editor.document)
+      );
+      editor.edit((editBuilder) => {
+        results.forEach((result) => {
+          result.edit?.(editBuilder);
         });
+      });
 
-        return;
-      }
-
-      let transposed = "";
-      let confused = false;
-
-      const queue = [...separators];
-      while (queue.length > 0) {
-        const sep = queue.shift()!;
-        const splits = toTranspose.split(sep);
-        if (splits.length === 2) {
-          console.log(`hit '${sep}'`);
-          if (transposed) {
-            confused = true;
-            break;
-          }
-
-          const [a, b] = splits;
-          transposed = `${b}${sep}${a}`;
-          if (
-            delims.includes(sep) &&
-            toTranspose.split(sep + " ").length === 2
-          ) {
-            console.log(`adding space to ${sep}`);
-            transposed = "";
-
-            queue.unshift(sep + " ");
-          } else if (
-            ops.includes(sep) &&
-            toTranspose.split(` ${sep} `).length === 2
-          ) {
-            console.log(`adding spaces around ${sep}`);
-            transposed = "";
-
-            queue.unshift(` ${sep} `);
-          }
-        }
-      }
-
-      if (!transposed) {
-        const splits = toTranspose.split(" ");
-        if (splits.length === 2) {
-          const [a, b] = splits;
-          transposed = `${b} ${a}`;
-        }
-      }
-
-      if (transposed) {
-        if (confused) {
-          vscode.window.showErrorMessage("Cannot transpose this selection");
-        } else {
-          editor.edit((editBuilder) => {
-            editBuilder.replace(selection, transposed);
-          });
-        }
-      } else {
-        vscode.window.showErrorMessage("Cannot transpose this selection");
-      }
+      editor.selections = results.map((result) => result.selection);
     }
   );
 
   context.subscriptions.push(disposable);
+}
+
+function transpose(
+  range: vscode.Range | vscode.Selection,
+  document: vscode.TextDocument
+): { edit?: (_: vscode.TextEditorEdit) => void; selection: vscode.Selection } {
+  if (range.isEmpty) {
+    const expandedRange = new vscode.Range(
+      range.start.translate(0, -1),
+      range.end.translate(0, 1)
+    );
+    const text = document.getText(expandedRange);
+
+    return {
+      edit: (editBuilder) => {
+        editBuilder.replace(expandedRange, text.split("").reverse().join(""));
+      },
+      selection: new vscode.Selection(expandedRange.end, expandedRange.end),
+    };
+  }
+
+  const { transposed, confused } = transposePhrase(document.getText(range));
+
+  if (transposed) {
+    if (confused) {
+      vscode.window.showErrorMessage("Cannot transpose this selection");
+    } else {
+      return {
+        edit: (editBuilder) => {
+          editBuilder.replace(range, transposed);
+        },
+        selection: new vscode.Selection(range.end, range.end),
+      };
+    }
+  } else {
+    vscode.window.showErrorMessage("Cannot transpose this selection");
+  }
+
+  return {
+    selection: new vscode.Selection(range.start, range.end),
+  };
+}
+
+function transposePhrase(toTranspose: string) {
+  let transposed = "";
+  let confused = false;
+
+  const queue = [...separators];
+  while (queue.length > 0) {
+    const sep = queue.shift()!;
+    const splits = toTranspose.split(sep);
+    if (splits.length === 2) {
+      console.log(`hit '${sep}'`);
+      if (transposed) {
+        confused = true;
+        break;
+      }
+
+      const [a, b] = splits;
+      transposed = `${b}${sep}${a}`;
+      if (delims.includes(sep) && toTranspose.split(sep + " ").length === 2) {
+        console.log(`adding space to ${sep}`);
+        transposed = "";
+
+        queue.unshift(sep + " ");
+      } else if (
+        ops.includes(sep) &&
+        toTranspose.split(` ${sep} `).length === 2
+      ) {
+        console.log(`adding spaces around ${sep}`);
+        transposed = "";
+
+        queue.unshift(` ${sep} `);
+      }
+    }
+  }
+
+  if (!transposed) {
+    const splits = toTranspose.split(" ");
+    if (splits.length === 2) {
+      const [a, b] = splits;
+      transposed = `${b} ${a}`;
+    }
+  }
+
+  return { transposed, confused };
 }
