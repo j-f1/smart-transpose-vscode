@@ -43,6 +43,20 @@ export function activate(context: vscode.ExtensionContext) {
 
       const toTranspose = document.getText(selection);
 
+      if (!toTranspose) {
+        const range = new vscode.Range(
+          selection.start.translate(0, -1),
+          selection.end.translate(0, 1)
+        );
+        const text = document.getText(range);
+
+        editor.edit((editBuilder) => {
+          editBuilder.replace(range, text.split("").reverse().join(""));
+        });
+
+        return;
+      }
+
       let transposed = "";
       let confused = false;
 
