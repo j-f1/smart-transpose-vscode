@@ -2,34 +2,7 @@
 
 import * as vscode from "vscode";
 
-const ops = [
-  "+",
-  "-",
-  "*",
-  "/",
-  "%",
-  "^",
-  "&",
-  "|",
-  "<<",
-  ">>",
-  ">>>",
-  "==",
-  "!=",
-  "===",
-  "!==",
-  "<",
-  ">",
-  "<=",
-  ">=",
-  "&&",
-  "||",
-  "=",
-];
-
-const delims = [",", ";", ":"];
-
-const separators = [...ops, ...delims];
+const separators = [",", ";", ":"];
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
@@ -119,19 +92,11 @@ function transposePhrase(toTranspose: string) {
 
       const [a, b] = splits;
       transposed = `${b}${sep}${a}`;
-      if (delims.includes(sep) && toTranspose.split(sep + " ").length === 2) {
+      if (toTranspose.split(sep + " ").length === 2) {
         console.log(`adding space to ${sep}`);
         transposed = "";
 
         queue.unshift(sep + " ");
-      } else if (
-        ops.includes(sep) &&
-        toTranspose.split(` ${sep} `).length === 2
-      ) {
-        console.log(`adding spaces around ${sep}`);
-        transposed = "";
-
-        queue.unshift(` ${sep} `);
       }
     }
   }
