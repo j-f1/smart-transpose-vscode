@@ -6,7 +6,7 @@ const separators = [",", ";", ":"];
 
 export function activate(context: vscode.ExtensionContext) {
   const disposable = vscode.commands.registerCommand(
-    "extension.transpose",
+    "transpose.smart",
     function () {
       const editor = vscode.window.activeTextEditor;
       if (!editor) return;

@@ -1,26 +1,17 @@
-# Enhanced Transpose
+# Smart Transpose for VS Code
 
-## Demo
+![](demo.gif)
 
-<!-- ![demo](demo.gif) -->
+Are you bad at typing? Do you find yourself often getting two letters backwards? Then you may be familiar with macOS’s ⌃T shortcut, which makes it easy to swap two adjacent letters.
 
-## VS Code API
+This extension is designed to augment that shortcut (to fix bigger mistakes!). For example, select a pair of words and press ⌃T. The two words will be swapped. Or select a pair of parameters to a function, then press ⌃T to swap them.
 
-### `vscode` module
+## Setup
 
-- [`commands.registerCommand`](https://code.visualstudio.com/api/references/vscode-api#commands.registerCommand)
-- [`window.activeTextEditor`](https://code.visualstudio.com/api/references/vscode-api#window.activeTextEditor)
-- [`TextDocument.getText`](https://code.visualstudio.com/api/references/vscode-api#TextDocument.getText)
-- [`TextEditor.edit`](https://code.visualstudio.com/api/references/vscode-api#TextEditor.edit)
-- [`TextEditorEdit`](https://code.visualstudio.com/api/references/vscode-api#TextEditorEdit)
+Make sure you unbind the shortcut for “Transpose Letters” (`editor.action.transposeLetters`) and then map “Smart Transpose” (`transpose.smart`) to `ctrl+t`.
 
-### Contribution Points
+## Changelog
 
-- [`contributes.commands`](https://code.visualstudio.com/api/references/contribution-points#contributes.commands)
+### v1.0.0
 
-## Running the Sample
-
-- Run `npm install` in terminal to install dependencies
-- Run the `Run Extension` target in the Debug View. This will:
-  - Start a task `npm: watch` to compile the code
-  - Run the extension in a new VS Code window
+Initial release 🎉
