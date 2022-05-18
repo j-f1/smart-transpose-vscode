@@ -1,5 +1,5 @@
 {
-  "name": "vscode-smart-transpose",
+  "name": "smart-transpose",
   "displayName": "Smart Transpose",
   "description": "Improves the built-in transpose command to work with more than individual characters",
   "version": "1.0.0",
@@ -8,7 +8,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/j-f1/vscode-smart-transpose"
+    "url": "https://github.com/j-f1/smart-transpose-vscode"
   },
   "engines": {
     "vscode": "^1.32.0"
